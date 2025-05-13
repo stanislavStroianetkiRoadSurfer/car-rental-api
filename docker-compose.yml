@@ -1,0 +1,53 @@
+services:
+  app:
+    build:
+      dockerfile: docker/php/Dockerfile
+      context: .
+      args:
+        - APP_ENV=dev
+    depends_on:
+      - database
+    environment:
+      - APP_ENV=dev
+    volumes:
+      - ./:/app:cached
+      - ./var:/app/var
+    networks:
+      - rsf-network
+
+  nginx:
+    image: nginx:1.23-alpine
+    working_dir: /app
+    volumes:
+      - ./public:/app/public:cached
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app
+    ports:
+      - "86:80"
+    networks:
+      - rsf-network
+
+  database:
+    platform: linux/amd64
+    image: mysql:8
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    command: --default-storage-engine=InnoDB --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+    ports:
+      - "3306:3306"
+    volumes:
+      - database_data:/var/lib/mysql
+    networks:
+      - rsf-network
+
+volumes:
+  phpunit:
+    name: 'bcc_phpunit'
+  database_data:
+    name: 'bcc_database_data'
+
+networks:
+  rsf-network:
+    driver: bridge

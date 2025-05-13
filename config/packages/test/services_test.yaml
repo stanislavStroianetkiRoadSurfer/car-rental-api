@@ -1,0 +1,16 @@
+# According to https://symfony.com/doc/current/configuration.html we can't put `services.yaml` into `config/test` directory because its overwritten with the default `services.yaml`.
+services:
+  _defaults:
+    public: true
+
+  test.doctrine.database_drop_command:
+    alias: doctrine.database_drop_command
+
+  test.doctrine.database_create_command:
+    alias: doctrine.database_create_command
+
+  test.doctrine_migrations.migrate_command:
+    alias: doctrine_migrations.migrate_command
+
+  test.doctrine.fixtures_load_command:
+    alias: doctrine.fixtures_load_command

@@ -1,0 +1,13 @@
+includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-mockery/extension.neon
+    - phpstan-baseline.neon
+parameters:
+    level: 8
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+        - identifier: missingType.iterableValue
+    treatPhpDocTypesAsCertain: false
+    tmpDir: ./.cache/phpstan
