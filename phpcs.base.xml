@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Pricing Microservice"
          xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
-    <description>Roadsurfer Coding Standard</description>
+    <description>car-rental-api Coding Standard</description>
     <config name="installed_paths" value="../../slevomat/coding-standard"/>
 
     <!-- Parse only *.php files -->

@@ -1,6 +1,6 @@
 {
-    "name": "roadsurfer-com/backend-challenge",
-    "description": "Roadsurfer backend challenge",
+    "name": "challenge/car-rental-api",
+    "description": "car-rental-api backend challenge",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
