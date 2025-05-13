@@ -1,16 +1,3 @@
-# 👋 Welcome to the Roadsurfer Backend Challenge
-
-## 🎯 Goal
-Your goal is to:
-- Analyze the changes introduced in the pull request
-- Identify potential issues or bugs
-- Suggest improvements in design, structure, readability, performance, and security
-- Think out loud and explain your reasoning clearly
-
-We’re interested in **how you think**, how you **communicate technical feedback**, and how you approach **realistic backend problems**.
-
-Good luck and enjoy! 🚐
-
 ## Installation
 
 ### Creating the containers
