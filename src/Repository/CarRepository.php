@@ -17,4 +17,13 @@ class CarRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Car::class);
     }
+
+    public function getByStationId(int $stationId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.station = :stationId')
+            ->setParameter('stationId', $stationId)
+            ->getQuery()
+            ->getResult();
+    }
 }

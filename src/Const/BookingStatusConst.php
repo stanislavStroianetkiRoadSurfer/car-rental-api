@@ -12,4 +12,12 @@ class BookingStatusConst
     public const COMPLETED = 'completed';
     public const CANCELLED = 'cancelled';
     public const REJECTED = 'rejected';
+
+    public static function getBlockingStatuses(): array
+    {
+        return [
+            self::CONFIRMED,
+            self::ON_GOING,
+        ];
+    }
 }
