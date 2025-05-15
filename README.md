@@ -17,6 +17,12 @@ docker compose exec app composer install
 docker compose exec app  bin/console doctrine:database:create --if-not-exists
 ```
 
+### Create database tables / run migrations
+```bash
+docker compose exec app  bin/console doctrine:migrations:migrate
+```
+
+
 ### Loading fixtures
 ```bash
 docker compose exec app  bin/console doctrine:fixtures:load
