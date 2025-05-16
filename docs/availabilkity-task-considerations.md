@@ -22,7 +22,7 @@ As without peering with a domain expert it is hard to tell what constraints will
 
 ### Pricing
 
-The pricing information is accessible via a service that can be called via an API call. Prices can be different between models and timeframes according to the example PR.
+The pricing information is accessible via a service that can be called via an API call. Prices can be different between ~~models~~ cars and timeframes according to the example PR.
 
 We do have control over that pricing service though as well and could move logic over to that service and adjust its endpoints to fit the applications needs better than in the existing PR.
 
