@@ -14,7 +14,7 @@ There are no indicators on any business constraints towards the availability cal
 
 A car therefore is considered "available" between days for now by:
 - the car being allocated to the accoding station
-- no booking overlapping during the whole period by *day*, ignoring hours
+- no booking overlapping during the whole period by *day*, plus a buffer logic to ensure "down time" between rentals
 - "rejected" and "cancelled" bookings should be ignored when calculating (in)availability
 
 As without peering with a domain expert it is hard to tell what constraints will be needed to be implemented, I will keep it simple, but might sketch in example filters.
