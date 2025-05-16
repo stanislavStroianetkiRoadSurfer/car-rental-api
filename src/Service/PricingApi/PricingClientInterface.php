@@ -18,5 +18,6 @@ interface PricingClientInterface
         array $carIds, // as mentioned, maybe should be changed to price per model, not individual car?
         \DateTimeInterface $startDate,
         \DateTimeInterface $endDate,
+        string $currency,
     ): array;
 }

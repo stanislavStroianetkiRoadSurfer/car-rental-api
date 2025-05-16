@@ -23,6 +23,7 @@ class HttpPricingClient implements PricingClientInterface
         array $carIds,
         \DateTimeInterface $startDate,
         \DateTimeInterface $endDate,
+        string $currency
     ): array {
         try {
             $response = $this->httpClient->request(
@@ -34,6 +35,7 @@ class HttpPricingClient implements PricingClientInterface
                         'carIds' => implode(',', $carIds),
                         'startDate' => $startDate->format('Y-m-d'),
                         'endDate' => $endDate->format('Y-m-d'),
+                        'currency' => $currency,
                     ],
                 ]
             );

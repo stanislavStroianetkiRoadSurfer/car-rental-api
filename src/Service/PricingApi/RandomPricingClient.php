@@ -22,6 +22,7 @@ class RandomPricingClient implements PricingClientInterface
         array $carIds,
         \DateTimeInterface $startDate,
         \DateTimeInterface $endDate,
+        string $currency,
     ): array {
         $rentalPrices = [];
         foreach ($carIds as $carId) {
@@ -32,7 +33,7 @@ class RandomPricingClient implements PricingClientInterface
             $rentalPrices[] = new RentalPrice(
                 $stationId, 
                 $carId,
-                'EUR',
+                $currency,
                 (float) rand(50,450),
             );
         }
