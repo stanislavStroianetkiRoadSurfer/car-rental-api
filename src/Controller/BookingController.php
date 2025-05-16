@@ -13,10 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[Route('/bookings')]
 class BookingController extends AbstractController
 {
-    #[Route('', name: 'booking_create', methods: [Request::METHOD_POST])]
+    #[Route('/bookings', name: 'booking_create', methods: [Request::METHOD_POST])]
     public function create(
         Request $request,
         ValidatorInterface $validator,
