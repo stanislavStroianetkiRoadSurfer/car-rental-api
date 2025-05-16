@@ -10,7 +10,7 @@ There are no indicators on any business constraints towards the availability cal
 - pick up times potentially needing to be taken into account, e.g. no pickup out of working hours or on Sundays or Bank Holidays, but return *might* be possible (maybe depending on the station)
 - "down time" of a car between being returned and picked up by the next renter, e.g. for cleaning purposes
 - how fix are cars bound to a station? To accommodate a high demand of cars at station x, it *could* be a business practice to shift cars over to it from nearby stations when the station is running out of cars to rent out. Also, the API discussed in the existing PR only allows pickup and return station to be the same, there are services allowing them to be different.
-- the existing codebase contains a concept of booking status and car activity, that is not addressed at all in the example PR, I will filter out some booking status based on assumptions that would need to be validated and inactive cars
+- the existing codebase contains a concept of booking statuses and car activity, the latter is not addressed at all in the example PR, I will filter out inactive cars besides blocking booking statuses
 
 A car therefore is considered "available" between days for now by:
 - the car being allocated to the accoding station
