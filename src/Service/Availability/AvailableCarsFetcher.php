@@ -12,6 +12,7 @@ class AvailableCarsFetcher
     public function __construct(
         private readonly CarRepositoryInterface $carRepository,
         private readonly BookingRepositoryInterface $bookingRepository,
+        private readonly RentalTimeBufferCalculator $rentalTimeBufferCalculator,
     ) {}
 
     public function getActiveCarsWithoutBookingsDuringTimeframe(
@@ -31,7 +32,7 @@ class AvailableCarsFetcher
             return [];
         } 
 
-        $relevantBookingForCars = $this->bookingRepository->getBookingsForCarsDuringTimeframe(array_keys($activeCarsIndexedByCarId), $startDate, $endDate);
+        $relevantBookingForCars = $this->getRelevantBookingsForCarsDuringTimeframe(array_keys($activeCarsIndexedByCarId), $startDate, $endDate);
 
         foreach ($relevantBookingForCars as $booking) {
             unset($activeCarsIndexedByCarId[$booking->getCar()->getId()]);
@@ -50,5 +51,18 @@ class AvailableCarsFetcher
         }
 
         return $indexed;
+    }
+
+    private function getRelevantBookingsForCarsDuringTimeframe(
+        array $carIds, 
+        \DateTimeInterface $startDate, 
+        \DateTimeInterface $endDate
+    ): array 
+    {
+        return $this->bookingRepository->getBookingsForCarsDuringTimeframe(
+            $carIds, 
+            $this->rentalTimeBufferCalculator->getAdjustedStartDatetime($startDate), 
+            $this->rentalTimeBufferCalculator->getAdjustedEndDatetime($endDate),
+        );
     }
 }
