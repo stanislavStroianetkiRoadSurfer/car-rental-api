@@ -45,7 +45,7 @@ I expect the "premium user" validation etc in the booking service being far out 
 
 We could reason that the premium logic solely based on car model and price could be moved over to the pricing endpoint. But as there might be further criteria added that is out of my visibility, I would rather keep it within our application.
 
-The example PR hardcoded the models and price threshold, I suggest to move it into the database to allow adjustments without a need of a deployment or config change at minimum. To properly limit unexpected side effects this could imply to move the model string in the cars table into its own models table introducing foreign keys, once more, domain design topics are piling up before even looking into the actual coding solution.
+The example PR hardcoded the models and price threshold, I would suggest to move it into the database to allow adjustments without a need of a deployment or config change at minimum. To properly limit unexpected side effects this could imply to move the model string in the cars table into its own models table introducing foreign keys, once more, domain design topics are piling up before even looking into the actual coding solution. Also, with different currencies, there's not *one* threshold to configure per model, but multiple. Adding all that logic feels a bit heavy to demonstrate my coding skills though...
 
 
 ## Existing Architecture
