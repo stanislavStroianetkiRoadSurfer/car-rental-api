@@ -18,11 +18,18 @@ class CarRepository extends ServiceEntityRepository implements CarRepositoryInte
         parent::__construct($registry, Car::class);
     }
 
-    public function getAvailableCars(int $stationId, \DateTimeInterface $from, \DateTimeInterface $to)
+    /**
+     * @return array|Car[]
+     */
+    public function getAllActiveCarsOfStation(int $stationId): array
     {
+        // Once more: this only works under the assumption that a car is assigned to the same station
+        // always, else we'd need some datasource being updated to the predicted station at pickup time...
+
         return $this->createQueryBuilder('c')
             ->andWhere('c.station = :stationId')
             ->setParameter('stationId', $stationId)
+            ->andWhere('c.active = TRUE')
             ->getQuery()
             ->getResult();
     }

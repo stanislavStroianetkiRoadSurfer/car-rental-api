@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Request\AvailabilityRequest;
-use App\Service\CarAvailabilityService;
+use App\Service\AvailabilityService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,13 +15,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AvailabilityController extends AbstractController
-{    
+{  
     public function __construct(
-        private readonly CarAvailabilityService $carAvailablityService,
+        private readonly AvailabilityService $availablityService,
         private readonly ValidatorInterface $validator,
-    )
-    {}
-    
+    ) {}
     
     #[Route('/availabilities', methods: [Request::METHOD_GET])]
     public function index(
@@ -40,7 +38,7 @@ class AvailabilityController extends AbstractController
             return new JsonResponse(['error' => (string) $violations], Response::HTTP_BAD_REQUEST);
         }
 
-        $availableCars = $this->carAvailablityService->getAvailableCars($availabilityRequestDTO);
+        $availableCars = $this->availablityService->getAvailableCarsWithPrices($availabilityRequestDTO);
 
         return new JsonResponse($availableCars, Response::HTTP_OK);
     }

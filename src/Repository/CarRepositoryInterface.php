@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Car;
+
 interface CarRepositoryInterface
 {
-    public function getAvailableCars(int $stationId, \DateTimeInterface $from, \DateTimeInterface $to);
+    /**
+     * @return array|Car[]
+     */
+    public function getAllActiveCarsOfStation(int $stationId): array;
 }

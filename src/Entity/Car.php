@@ -26,12 +26,12 @@ class Car
     #[ORM\ManyToOne(targetEntity: Station::class)]
     private ?Station $station = null;
 
-    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'car')]
-    private Collection $bookings;
+    //#[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'Car')]
+    //private Collection $bookings;
 
     public function __construct()
     {
-        $this->bookings = new ArrayCollection();
+        //$this->bookings = new ArrayCollection();
     }
 
     public function setId(int $id): self

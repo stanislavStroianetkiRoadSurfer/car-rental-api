@@ -55,7 +55,7 @@ class CarFixtures extends Fixture implements DependentFixtureInterface
 
             $manager->persist($car);
 
-            // using a hardcoded ref as no other property combination is considered "unique" mid term 
+            // using a hardcoded ref as no other property combination is considered "unique" mid term
             // (there might be more than one car model per station quickly, also in fictures)
             $this->addReference($carData['car_ref'], $car); 
         }

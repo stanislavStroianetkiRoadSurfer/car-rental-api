@@ -50,15 +50,21 @@ class BookingFixtures extends Fixture implements DependentFixtureInterface
             $booking = new Booking();
             $booking->setCar($this->getReference($bookingData['car_ref'], Car::class));
             $booking->setStatus($bookingData['status']);
-            $booking->setStartDate(\DateTimeImmutable::createFromFormat('Y-m-d H:i', $bookingData['startDate']));
-            $booking->setEndDate(\DateTimeImmutable::createFromFormat('Y-m-d H:i', $bookingData['endDate']));
+            $booking->setStartDate($this->createDatetimeFromString($bookingData['startDate']));
+            $booking->setEndDate($this->createDatetimeFromString($bookingData['endDate']));
             // While the Booking class claims customer email can be null, the db schema does not allow it...
+            // Fixing that feels out of scope of the task, boy scout rule would suggest fixing it :-)
             $booking->setCustomerEmail($bookingData['customerEmail']);
 
             $manager->persist($booking);
         }
 
         $manager->flush();
+    }
+
+    private function createDatetimeFromString(string $datetime): \DateTimeInterface
+    {
+        return \DateTimeImmutable::createFromFormat('Y-m-d H:i', $datetime);
     }
 
     public function getDependencies(): array

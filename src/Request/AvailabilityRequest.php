@@ -25,11 +25,11 @@ final readonly class AvailabilityRequest
 
     public function getStartDate(): \DateTimeImmutable
     {
-        return new \DateTimeImmutable($this->startDate);
+        return \DateTimeImmutable::createFromFormat('Y-m-d H:i', $this->startDate);
     }
 
     public function getEndDate(): \DateTimeImmutable
     {
-        return new \DateTimeImmutable($this->endDate);
+        return \DateTimeImmutable::createFromFormat('Y-m-d H:i', $this->endDate);
     }
 }
