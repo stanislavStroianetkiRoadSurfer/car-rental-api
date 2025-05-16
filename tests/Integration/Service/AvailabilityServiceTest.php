@@ -32,8 +32,8 @@ class AvailabilityServiceTest extends KernelTestCase
         // When
         $request = $this->createRequest(
             $station->getId(),
-            '2026-05-20',
-            '2026-05-21',
+            '2026-05-20 11:00',
+            '2026-05-21 17:00',
         );
         $availableCars = $this->availabilityService->getAvailableCarsWithPrices($request);
 

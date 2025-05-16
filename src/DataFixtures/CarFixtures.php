@@ -26,10 +26,16 @@ class CarFixtures extends Fixture implements DependentFixtureInterface
             'car_ref' => 'car_muc_2',
         ],
         [
+            'model' => 'California Beach',
+            'station_ref' => 'station_münchen',
+            'active' => true,
+            'car_ref' => 'car_muc_3',
+        ],
+        [
             'model' => 'Ford Nugget',
             'station_ref' => 'station_münchen',
             'active' => false,
-            'car_ref' => 'car_muc_3',
+            'car_ref' => 'car_muc_4',
         ],
         [
             'model' => 'Mercedes Marco Polo',

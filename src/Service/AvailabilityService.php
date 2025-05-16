@@ -4,74 +4,54 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Entity\Car;
-use App\Repository\BookingRepositoryInterface;
-use App\Repository\CarRepositoryInterface;
 use App\Request\AvailabilityRequest;
+use App\Service\Availability\AvailableCarsFetcher;
+use App\Service\Availability\PremiumRentalDecider;
+use App\Service\PricingApi\PricingClientInterface;
 use App\ViewModel\AvailabilityViewModel;
 
 class AvailabilityService
 {
     public function __construct(
-        private readonly CarRepositoryInterface $carRepository,
-        private readonly BookingRepositoryInterface $bookingRepository,
-    ) {
-    }
+        private readonly AvailableCarsFetcher $availableCarsFetcher,
+        private readonly PricingClientInterface $pricingClient,
+        private readonly PremiumRentalDecider $premiumDecider,
+    ) {}
 
     public function getAvailableCarsWithPrices(
         AvailabilityRequest $request,
     ): array {
-        $availableCars = $this->getActiveCarsWithoutBooking($request);
+        $availableCars = $this->availableCarsFetcher->getActiveCarsWithoutBookingsDuringTimeframe(
+            $request->getStationId(), 
+            $request->getStartDate(), 
+            $request->getEndDate(),
+        );
 
-        // Todo: fetch and append proces, calculate and append premium flag
+        if (count($availableCars) === 0) {
+            return [];
+        }
 
-        return array_map(
-            fn (Car $car): AvailabilityViewModel => new AvailabilityViewModel(
+        $rentalPrices = $this->pricingClient->calculatePrices(
+            $request->getStationId(),
+            array_keys($availableCars),
+            $request->getStartDate(),
+            $request->getEndDate()
+        );
+
+        $carsWithPricing = [];
+        foreach ($rentalPrices as $rentalPrice) {
+            $car = $availableCars[$rentalPrice->carId];
+            $onlyForPremium = $this->premiumDecider->isPremiumOnly($car, $rentalPrice);
+
+            $carsWithPricing[] = new AvailabilityViewModel(
                 $car->getId(),
                 $car->getModel(),
                 $request->getStationId(),
-                0.0,
-                false,
-            ),
-            $availableCars
-        );
-    }
-
-    /**
-     * @return mixed[]
-     */
-    private function getActiveCarsWithoutBooking(AvailabilityRequest $request): array 
-    {
-        // Todo: Writing the most efficient single query to get all cars that do *not* have a booking 
-        // during the timeframe is a bit tricky after some time invested, it feels like it would need a 
-        // subquery ideally, which isn't thaaaat straight forward with Doctrine. 
-        // I will follow a slightly more "naive" approach for now similiar to the example PR, but with 
-        // less db queries and would potentially look deeper into it if the time allows it.
-        
-        $activeCarsIndexedByCarId = $this->getActiveCarsByStationIndexedByCarId($request->getStationId());
-
-        if (count($activeCarsIndexedByCarId) == 0) {
-            return [];
-        } 
-
-        $relevantBookingForCars = $this->bookingRepository->getBookingsForCarsDuringTimeframe(array_keys($activeCarsIndexedByCarId), $request->getStartDate(), $request->getEndDate());
-
-        foreach ($relevantBookingForCars as $booking) {
-            unset($activeCarsIndexedByCarId[$booking->getCar()->getId()]);
+                $rentalPrice->price,
+                $onlyForPremium,
+            );
         }
 
-        return $activeCarsIndexedByCarId;
-    }
-
-    private function getActiveCarsByStationIndexedByCarId(int $stationId): array
-    {
-        $activeCars = $this->carRepository->getAllActiveCarsOfStation($stationId);
-
-        $indexed = [];
-        foreach($activeCars as $car) {
-            $indexed[$car->getId()] = $car;
-        }
-
-        return $indexed;
+        return $carsWithPricing;
     }
 }
