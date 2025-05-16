@@ -23,6 +23,9 @@ class BookingRepository extends ServiceEntityRepository implements BookingReposi
     {
         // Todo: logic copied over from example PR, needs to be tested thoroughly
         // sadly automated tests have an issue with loading booking fixtures...
+        //
+        // depending on the query to be used in the end, it should be considered to analyse the
+        // query carefully using EXPLAIN and to create an index to improve the read performance
         return $this->createQueryBuilder('b')
             ->andWhere('b.car IN (:carIds)')
             ->andWhere('b.startDate < :to')
