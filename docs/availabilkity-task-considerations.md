@@ -43,9 +43,11 @@ The API is expected to expose the information whether a car is only available to
 
 I expect the "premium user" validation etc in the booking service being far out of scope.
 
-We could reason that the premium logic solely based on car model and price could be moved over to the pricing endpoint. But as there might be further criteria added that is out of my visibility, I would rather keep it within our application.
+We could reason that the premium logic solely based on car model and price could be moved over to the pricing endpoint. But as there might be further criteria added that is out of my visibility, I would rather keep it within our application to keep the pricing endpoints concerns to the core.
 
-The example PR hardcoded the models and price threshold, I would suggest to move it into the database to allow adjustments without a need of a deployment or config change at minimum. To properly limit unexpected side effects this could imply to move the model string in the cars table into its own models table introducing foreign keys, once more, domain design topics are piling up before even looking into the actual coding solution. Also, with different currencies, there's not *one* threshold to configure per model, but multiple. Adding all that logic feels a bit heavy to demonstrate my coding skills though...
+The example PR hardcoded the models and price threshold, I would suggest to move it into the database to allow adjustments without a need of a deployment or config change at minimum. To properly limit unexpected side effects this could imply to move the model string in the cars table into its own models table introducing foreign keys (aka normalisation) business domain topics are piling up before even looking into the actual coding solution. Also, with different currencies, there's not *one* threshold to configure per model, but multiple. Adding all that logic feels a bit heavy to demonstrate my coding skills though...
+
+I've decided though to encapsulate that logic into its on class/service that can then be adjusted accordingly later on.
 
 
 ## Existing Architecture
@@ -59,10 +61,10 @@ I personally favour a bit more visible separation of layers, by folder structure
 
 ## Aimed approach
 
-The existing PR is implying a few details on the availability API endpoint structure (uri, using query parameters over route parameters, ...) which I will not touch but rather lean towards (while one could e.g. argue that /station/:station_id/availabilities might be a better API uri choice).
+The existing PR is implying a few details on the availability API endpoint structure (uri, using query parameters over route parameters, ...) which I will not touch but rather lean towards (while one could e.g. argue that /station/:station_id/availabilities might be a better API uri choice, etc.).
 
 The "availability calculation" is the core aspect of the solution and therefore should be implemented robust and well tested.
 
-As mentioned above I will stick to most concepts established in the main branch, but might make slight adjustments. I will keep the adjustments to the task at hand, not aiming for consistency and apply those changes to the existing endpoints but would suggest and discuss doing so in a real life scenario before.
+As mentioned above I will stick to most concepts established in the main branch, but might make slight adjustments. I will keep the adjustments focused on the task at hand, not aiming for full consistency accross the existing codebase, but would suggest and discuss doing so in a real life scenario before starting or when identifying a change need that feels sensible to apply.
 
-Depending on aaaaall the business domain considerations, due to time constraints I will *not* implement them all.
+Depending on aaaaall the business domain considerations, due to time constraints I will *not* implement them all but sketch the "entry point" to expand it later on.

@@ -21,6 +21,8 @@ class BookingRepository extends ServiceEntityRepository implements BookingReposi
 
     public function getBookingsForCarsDuringTimeframe(array $carIds, \DateTimeInterface $from, \DateTimeInterface $to): array
     {
+        // Todo: logic copied over from example PR, needs to be tested thoroughly
+        // sadly automated tests have an issue with loading booking fixtures...
         return $this->createQueryBuilder('b')
             ->andWhere('b.car IN (:carIds)')
             ->andWhere('b.startDate < :to')
