@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Service\Availability;
 
+use App\Const\BookingStatusConst;
+use App\Entity\Car;
 use App\Repository\BookingRepositoryInterface;
 use App\Repository\CarRepositoryInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 class AvailableCarsFetcher
 {
@@ -13,19 +17,33 @@ class AvailableCarsFetcher
         private readonly CarRepositoryInterface $carRepository,
         private readonly BookingRepositoryInterface $bookingRepository,
         private readonly RentalTimeBufferCalculator $rentalTimeBufferCalculator,
+        private readonly EntityManagerInterface $em,
     ) {}
 
+    /**
+     * @return array|Car[] Array indexed by the car's id for easier retrieval.
+     */
     public function getActiveCarsWithoutBookingsDuringTimeframe(
         int $stationId,
         \DateTimeInterface $startDate,
         \DateTimeInterface $endDate,
     ): array {
-        // Todo: Writing the most efficient single query to get all cars that do *not* have a booking 
-        // during the timeframe is a bit tricky after some time invested, it feels like it would need a 
-        // subquery ideally, which isn't thaaaat straight forward with Doctrine. 
-        // I will follow a slightly more "naive" approach for now similiar to the example PR, but with 
-        // less db queries and would potentially look deeper into it if the time allows it.
+        // Providing two options here, one simple, leaning on the example PR, one where that logic is "converted" into a single query
+        // Placing the logic of both into one file isn't the way to go if both would reside in the codebase.
+        // This is rather for demonstration purposes of my pathway thoug
+        // If keeping both, I'd introduce a FetcherInterface, split implementations in two classes and most likely make use of the
+        // #When() attribute, e.g. checking a param configuration to let the DIC choose the appropriate one.
         
+        //return $this->simpleSolutionCloserToExampePR($stationId, $startDate, $endDate);
+        
+        return $this->rawSQLQueryMappedToEntitiesSolution($stationId, $startDate, $endDate);
+    }
+
+    /**
+     * This approach is more or less an improvement of the solution of the example PR running two queries.
+     */
+    private function simpleSolutionCloserToExampePR(int $stationId, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    {
         $activeCarsIndexedByCarId = $this->getActiveCarsByStationIndexedByCarId($stationId);
 
         if (count($activeCarsIndexedByCarId) == 0) {
@@ -38,7 +56,7 @@ class AvailableCarsFetcher
             unset($activeCarsIndexedByCarId[$booking->getCar()->getId()]);
         }
 
-        return $activeCarsIndexedByCarId;
+        return array_values($activeCarsIndexedByCarId);
     }
 
     private function getActiveCarsByStationIndexedByCarId(int $stationId): array
@@ -64,5 +82,38 @@ class AvailableCarsFetcher
             $this->rentalTimeBufferCalculator->getAdjustedStartDatetime($startDate), 
             $this->rentalTimeBufferCalculator->getAdjustedEndDatetime($endDate),
         );
+    }
+
+    /**
+     * Making use of a single query with a subquery, needing some manual steps to get results hydrated into Doctrine entities.
+     */
+    private function rawSQLQueryMappedToEntitiesSolution(int $stationId, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    {
+        $bookingStatusStatementInClause = '';
+        // some "ugly" looking code here as forraw sql queries one needs to take care of resolving IN clauses manually...
+        $statementBinds = ['stationId' => $stationId, 
+            'startDate' => $this->rentalTimeBufferCalculator->getAdjustedStartDatetime($startDate)->format('Y-m-d H:i'), 
+            'endDate' => $this->rentalTimeBufferCalculator->getAdjustedEndDatetime($endDate)->format('Y-m-d H:i'),
+        ];
+        foreach (BookingStatusConst::UNBLOCKING_STATUSES as $key => $status) {
+            if (!empty($bookingStatusStatementInClause)) {
+                $bookingStatusStatementInClause .= ', ';
+            }
+            $bookingStatusStatementInClause .= ':bookingStatus'.$key;
+            $statementBinds['bookingStatus'.$key] = $status;
+        }
+
+        $sql = 'SELECT c.* FROM car c WHERE c.station_id = :stationId AND c.active = TRUE AND c.id NOT IN ('
+            . 'SELECT b.car_id FROM booking b WHERE b.start_date < :endDate AND b.end_date > :startDate'
+            . (!empty($bookingStatusStatementInClause)?' AND b.status NOT IN(' . $bookingStatusStatementInClause .')':'')
+            . ')';
+
+        $rsm = new ResultSetMappingBuilder($this->em);
+        $rsm->addRootEntityFromClassMetadata('App\Entity\Car', 'c');
+
+        $nativeQuery = $this->em->createNativeQuery($sql, $rsm);
+        $nativeQuery->setParameters($statementBinds);
+        
+        return $nativeQuery->getResult();
     }
 }

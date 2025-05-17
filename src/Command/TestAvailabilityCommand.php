@@ -44,7 +44,7 @@ class TestAvailabilityCommand extends Command
 
             if (count($availableCars) !== $testRun['expectedNumOfAvailableCars']) {
                 $output->writeln('Returned num of available cars DOES NOT MATCH the expectation: ' . count($availableCars));
-                $output->writeln('Car ids: ' . implode(', ', array_keys($availableCars)));
+                $output->writeln('[DEBUG] Car ids: ' . implode(', ', array_keys($availableCars)));
                 $noErrors = false;
             } else {
                 $output->writeln('Returned num of available cars MATCHES the expectation.');
