@@ -78,7 +78,7 @@ As mentioned at several places of this document, due to time constraints and unk
 
 As addressed via email, for some reason I struggled to get my newly added booking fixtures to be loaded into the database that is recreated on every test suite execution. For manual fixtures loading with env=dev it works without issues, when executed via the subscriber, stations and cars are imported, bookings ignored...
 
-This made it hard to write appropriate integration tests to ensure that the most critical db query of the task is working for all sorts of (edge) cases. I decided to introduce a cli command running in dev, not test mode, to mimic the integration tests for this important piece of logic.
+This made it hard to write appropriate integration tests to ensure that the most critical db query of the task is working for all sorts of (edge) cases. I decided to introduce a cli command running in dev, not test mode, to mimic the integration tests for this important piece of logic which helped me to confirm the validity of the logic.
 
 ### Http client for pricing
 

@@ -21,18 +21,24 @@ class AvailableCarsFetcher
     ) {}
 
     /**
-     * @return array|Car[] Array indexed by the car's id for easier retrieval.
+     * Providing two options here, one simple, leaning on the example PR, one where that logic is "converted" into a single query
+     * Placing the logic of both into one file isn't the way to go if both would reside in the codebase.
+     * This is rather for demonstration purposes of my pathway though.
+     * 
+     * Mid term, depending on other business logic expectations, the code might end up being a mix of both an initial single query 
+     * plus additionally some more logic inside the php application.
+     * 
+     * As mentioned elsewhere, the read performance of both approaches can be improved by introducing appropriate indexes to the db.
+     * 
+     * @return array|Car[] Array indexed by the car's id for easier retrieval. Improvement idea: a dedicated collection class
      */
     public function getActiveCarsWithoutBookingsDuringTimeframe(
         int $stationId,
         \DateTimeInterface $startDate,
         \DateTimeInterface $endDate,
     ): array {
-        // Providing two options here, one simple, leaning on the example PR, one where that logic is "converted" into a single query
-        // Placing the logic of both into one file isn't the way to go if both would reside in the codebase.
-        // This is rather for demonstration purposes of my pathway thoug
-        // If keeping both, I'd introduce a FetcherInterface, split implementations in two classes and most likely make use of the
-        // #When() attribute, e.g. checking a param configuration to let the DIC choose the appropriate one.
+        // 
+        
         
         //return $this->simpleSolutionCloserToExampePR($stationId, $startDate, $endDate);
         
@@ -113,7 +119,13 @@ class AvailableCarsFetcher
 
         $nativeQuery = $this->em->createNativeQuery($sql, $rsm);
         $nativeQuery->setParameters($statementBinds);
+
+        $fetchedCars = $nativeQuery->getResult();
+        $indexedCars = [];
+        foreach ($fetchedCars as $car) {
+            $indexedCars[$car->getId()] = $car;
+        }
         
-        return $nativeQuery->getResult();
+        return $indexedCars;
     }
 }
