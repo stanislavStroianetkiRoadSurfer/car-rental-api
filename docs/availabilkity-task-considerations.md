@@ -7,32 +7,33 @@ The goal of the task is to provide an API endpoint that allows its consumers to 
 ### Availability
 
 There are no indicators on any business constraints towards the availability calculation. Potential constraints from my own experience of car renting could be:
-- pick up times potentially needing to be taken into account, e.g. no pickup out of working hours or on Sundays or Bank Holidays, but return *might* be possible (maybe depending on the station)
+- pick up times potentially needing to be taken into account, e.g. no pickup outside of working hours or on Sundays or Bank Holidays, but return *might* be possible (maybe depending on the station)
 - "down time" of a car between being returned and picked up by the next renter, e.g. for cleaning purposes
 - how fix are cars bound to a station? To accommodate a high demand of cars at station x, it *could* be a business practice to shift cars over to it from nearby stations when the station is running out of cars to rent out. Also, the API discussed in the existing PR only allows pickup and return station to be the same, there are services allowing them to be different.
 - the existing codebase contains a concept of booking statuses and car activity, the latter is not addressed at all in the example PR, I will filter out inactive cars besides blocking booking statuses
 
 A car therefore is considered "available" between days for now by:
+- the car being marked as active
 - the car being allocated to the accoding station
 - no booking overlapping during the whole period by *day*, plus a buffer logic to ensure "down time" between rentals
 - "rejected" and "cancelled" bookings should be ignored when calculating (in)availability
 
-As without peering with a domain expert it is hard to tell what constraints will be needed to be implemented, I will keep it simple, but might sketch in example filters.
+As without peering with a domain expert it is hard to tell what constraints will be needed to be implemented, I will keep it simple, but might sketch in some lightweight example filters.
 
 
 ### Pricing
 
 The pricing information is accessible via a service that can be called via an API call. Prices can be different between ~~models~~ cars and timeframes according to the example PR.
 
-We do have control over that pricing service though as well and could move logic over to that service and adjust its endpoints to fit the applications needs better than in the existing PR.
+We do have control over that pricing service though as well and could move logic over to that service and adjust its endpoint(s) to fit the application's needs better than in the existing PR.
 
 Flaws identified and to be improved in my opinion are (maybe not a fully complete list here):
-- should prices have a currency? this would lead to a bigger adjustment to the whole application and therefore will be left out of scope.
-- it should be avoided to call the API for each car individually for performance reasons
-- in a real life example, I would be surprised if prices wouldn't also depend on the station as typically prices are based on supply and demand and that's definitely different per region (even within a city for normal car renting, e.g. close to the airport or inner city versus in the outskirts)
-- the pricing API is expecting the car id of our application which is an auto incremented int according to the entity attribute. This feels a bit weird that our system is the primary of artificial identifiers, it might be better for stability to come up with an alternative.
-- also, the pricing API is not based on car *models* but individual cars, which again feels kind of uncommon for how I experienced car rental myself. I will *not* aim to change that now as business domain topics are getting more and more, but would strongly suggest evaluating this in real life before heading into implementation. 
-- the existing PR implies that prices can be cached. the likelihod that different users are aiming to use the exact same time period for the same station (which is missing in the existing PR, but considered a business expectation rather sooner than later) is unknown. The hit-miss-ratio of the cache might be pretty awful, making the cache a cost factor of storing temporary data without the assumed positive impact to the user experience. Also, prices might be a pretty dynamic thing to the business, e.g. by considering higher demands during vacation days, bookings made on certain models, etc. While a http request is considered "expensive" I would consider it best practice to leave performance optimization like caching to the pricing service itself for now, having the imaginary control over it, before looking into optimizing it on our end as well.
+- should prices have a currency? supporting different currencies is out of scope imo, but I decided to introduce currency as a concept on API and price property level of the availability endpoint, hardcoding to EUR (as all fixtures stations reside in DE)
+- it should be avoided to call the API for each car individually for performance reasons, for simplicity I decided to "just" adjust the API endpoint to await a list of car ids in one request and return prices for all cars, and *not* return a price line for cars without prices (for whatever reason - the example PR defaulted to a price of 0.0 which I don't feel being appropriate at all) 
+- in a real life example, I would be surprised if prices wouldn't also depend on the station as typically prices are based on supply and demand and that's definitely different per region (even within a city for normal car renting, e.g. close to the airport or inner city versus in the outskirts), therefore I expanded the API request by a new property
+- the pricing API is expecting the car's *id* from our application which is an auto incremented int according to the entity attribute, "controlled"/generated by our app's database. This feels a bit weird that our system is the primary of *artificial* identifiers, it might be better for stability to come up with an alternative. Left out of scope.
+- also, the pricing API is not based on car *models* but individual cars, which again feels kind of uncommon for how I experienced car rental myself. I will *not* aim to change that now as business domain topics are getting more and more, but would strongly suggest evaluating this in real life before heading into implementation.
+- the existing PR implies that prices can be cached. the likelihod that different users are aiming to use the exact same time period for the same station (which is missing in the existing PR, but considered a business expectation rather sooner than later) is unknown. The hit-miss-ratio of the cache might be pretty awful, making the cache a cost factor of storing temporary data without the assumed positive impact to the user experience. Also, prices might be a pretty dynamic thing to the business, e.g. by considering higher demands during vacation days, bookings made on certain models, etc, leading to prices changing frequently. While a http request is considered "expensive" I would consider it best practice to leave performance optimization like caching to the pricing service itself for now (knowing when to invalidate etc. in comparison to naively caching on our side), having the imaginary control over it, before looking into optimizing it on our end as well.
 
 I will try to reflect those aspects in my solution, but potentially not implement its details due to time constraints.
 
@@ -43,20 +44,22 @@ The API is expected to expose the information whether a car is only available to
 
 I expect the "premium user" validation etc in the booking service being far out of scope.
 
-We could reason that the premium logic solely based on car model and price could be moved over to the pricing endpoint. But as there might be further criteria added that is out of my visibility, I would rather keep it within our application to keep the pricing endpoints concerns to the core.
+We could reason that the premium logic solely based on car model and price could be moved over to the pricing endpoint. But as there might be further criteria added that is out of my visibility, I would rather keep it within our application to keep the pricing endpoints concerns to their core domain.
 
-The example PR hardcoded the models and price threshold, I would suggest to move it into the database to allow adjustments without a need of a deployment or config change at minimum. To properly limit unexpected side effects this could imply to move the model string in the cars table into its own models table introducing foreign keys (aka normalisation) business domain topics are piling up before even looking into the actual coding solution. Also, with different currencies, there's not *one* threshold to configure per model, but multiple. Adding all that logic feels a bit heavy to demonstrate my coding skills though...
+The example PR hardcoded the models and price threshold (and placed it's decision logic into a value object weirdly enough), I would *suggest* to move it into the database to allow adjustments without a need of a deployment or config change at minimum. To properly limit unexpected side effects this could (would?) imply to move the model string in the cars table into its own models table introducing foreign keys (aka normalisation) business domain topics are piling up before even looking into the actual coding solution. Also, with different currencies, there's not *one* threshold to configure per model, but multiple. Adding all that logic feels a bit heavy to demonstrate my coding skills though, so I will move the configuration out of that class into a config file, but leave it "hardcoded"...
 
 I've decided though to encapsulate that logic into its on class/service that can then be adjusted accordingly later on.
 
 
-## Existing Architecture
+## Existing Software Architecture
 
-The architecture follows the Symfony default's flavour of a folder structure focussing on the tech aspect (Controller, Entity, ...) more than the domain (Booking, Station, ...). 
+The architecture follows the Symfony default's flavour of a folder structure focussing on the typical tech aspects (Controller, Entity, ...) of a Symfony application more than the domain (Booking, Station, ...) or layers (Domain, Infrastructure, ...). 
 
-The existing application uses a pattern of "Requests" (not http, but application layer) to pass to "Service" classes (quite generic naming, I personally would recommend aiming for ubiquotous language or "DDD flavour" here, but as that is how the application has been started, I will try to keep up with the same convention) and using ViewModels to expose data back to the "outside". Also, there is no bounded context
+The existing application uses a pattern of "Requests" (not http, but application layer) to pass to "Service" classes (quite generic naming, I personally would recommend aiming for ubiquotous language or "DDD flavour" here, but as that is how the application has been started, I will keep up with the same convention for the classes dealing with the requests) and using ViewModels to expose data back to the "outside".  This could be interpreted as a lightweight form of CQRS, with Request objects being Commands and/or Queries and the Services being explicitly called handlers (instead of using a bus).
 
-I personally favour a bit more visible separation of layers, by folder structure or other concepts used. I would e.g. strongly recommend to lean towards ports and adapters *thinking* of the Hexagonal Architecture concept by at least introducing interfaces instead of concrete implementations between those layers, in this case here especially the infrastructure related classes like Repositories.
+Also, there is no visible bounded context between services within the application (which is fine, just an observation that a strict separation within the application is not aspired to what I can tell).
+
+I personally favour a bit more visible separation of layers, by folder structure or other concepts used. I would e.g. recommend to lean towards ports and adapters *thinking* of the Hexagonal Architecture concept by at least introducing interfaces instead of concrete implementations between those layers, in this case here especially the infrastructure related classes like Repositories. I will be doing so for the repositories I am touching.
 
 
 ## Aimed approach
@@ -65,6 +68,26 @@ The existing PR is implying a few details on the availability API endpoint struc
 
 The "availability calculation" is the core aspect of the solution and therefore should be implemented robust and well tested.
 
-As mentioned above I will stick to most concepts established in the main branch, but might make slight adjustments. I will keep the adjustments focused on the task at hand, not aiming for full consistency accross the existing codebase, but would suggest and discuss doing so in a real life scenario before starting or when identifying a change need that feels sensible to apply.
+As mentioned above I will stick to most concepts established in the main branch, but might make slight adjustments. I will keep the adjustments focused on the task at hand, not aiming for full consistency accross the existing codebase. In a real life scenario I would suggest and discuss doing so before starting or when identifying a change need that feels sensible to apply and then apply it across the application to follow the boyscout rule.
 
-Depending on aaaaall the business domain considerations, due to time constraints I will *not* implement them all but sketch the "entry point" to expand it later on.
+As mentioned at several places of this document, due to time constraints and unknowns of the business domain expectations, I decided to *not* implement all the suggested adjustments, but to introduce/sketch the "entry points" to expand them later on.
+
+## Obstacles during the implementation
+
+### Booking Fixtures loading for automated testing
+
+As addressed via email, for some reason I struggled to get my newly added booking fixtures to be loaded into the database that is recreated on every test suite execution. For manual fixtures loading with env=dev it works without issues, when executed via the subscriber, stations and cars are imported, bookings ignored...
+
+This made it hard to write appropriate integration tests to ensure that the most critical db query of the task is working for all sorts of (edge) cases.
+
+### Http client for pricing
+
+I did not try to mock an external API to use and test the http client implemented. I leaned towards logic from the example PR but made design choices/changes. For local testing purposes I alternatively introduced a "RandomPricingClient" which, as the name miiiiight indicate, behaves randomly in regards of the returned resultset.
+
+### Test coverage
+
+Due to reaching my personal time limit to do all the implementation, I did not reach the level of test coverage I would personally prefer. I typically focus on unit tests for classes with a certain level of "complicated logic" and therefore might skip e.g. simple value objects - but would apply team conventions primarily of course. Besides that, I tend to write integration tests for those situations where the wiring of layers is of importance and *can* properly be tested, which e.g. is the case for Repository classes imo, but is trickier for real http requests across the wire. There are techniques to mock those on a deeper level, but then it's not necessarily a proper integration test anymore in my view and can be covered via a unit test (with a "unit" being bigger than a single class maybe).
+
+Following that, I would probably have added (more) unit tests mainly for classes within the Service folder and integration tests for some central services, e.g. the AvailabilityService itself, to test it's wiring via Symfony's DIC (while needing to mock the pricing client).
+
+As a sidenode: at my previous company we used Behat or Codeception to do behavioral testing (BDD) on http level on several projects (not all), I did not see a clear benefit of suggesting or even implementing that, as not having a proper sparing on business behavior criteria anyways (which is the core goal of BDD to my understanding - not the http level tests).
