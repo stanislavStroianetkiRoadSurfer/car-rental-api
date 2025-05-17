@@ -26,7 +26,7 @@ class RandomPricingClient implements PricingClientInterface
     ): array {
         $rentalPrices = [];
         foreach ($carIds as $carId) {
-            if (rand(0,5) === 0) {
+            if (random_int(0,5) === 0) {
                 continue;
             }
 
@@ -34,7 +34,7 @@ class RandomPricingClient implements PricingClientInterface
                 $stationId, 
                 $carId,
                 $currency,
-                (float) rand(50,450),
+                (float) random_int(50,450),
             );
         }
 
