@@ -7,10 +7,7 @@ namespace App\Service\PricingApi;
 interface PricingClientInterface
 {
     /**
-     * @param int $stationId
      * @param array|int[] $carIds
-     * @param \DateTimeInterface $startDate
-     * @param \DateTimeInterface $endDate
      * @return array|RentalPrice[]
      */
     public function calculatePrices(

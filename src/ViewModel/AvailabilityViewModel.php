@@ -7,13 +7,12 @@ namespace App\ViewModel;
 final readonly class AvailabilityViewModel implements \JsonSerializable
 {
     public function __construct(
-        private readonly int $carId,
-        private readonly string $carModelName,
-        private readonly int $stationId,
-        private readonly float $price, // potentially introduce value object here with currency
-        private readonly bool $onlyForPremium,
-    ) {
-    }
+        public readonly int $carId,
+        public readonly string $carModelName,
+        public readonly int $stationId,
+        public readonly PriceViewModel $price,
+        public readonly bool $onlyForPremium,
+    ) {}
 
     public function jsonSerialize(): mixed
     {
@@ -21,7 +20,7 @@ final readonly class AvailabilityViewModel implements \JsonSerializable
             'car_id' => $this->carId,
             'car_model' => $this->carModelName,
             'station_id' => $this->stationId,
-            'price' => $this->price,
+            'price' => $this->price->jsonSerialize(),
             'only_for_premium' => $this->onlyForPremium,
         ];
     }

@@ -11,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class PremiumRentalDeciderTest extends KernelTestCase
 {
-    public function test_decides_for_not_premium_as_default()
+    public function test_decides_for_not_premium_as_default(): void
     {
         // Given
         $decider = new PremiumRentalDecider([]);
@@ -33,7 +33,7 @@ class PremiumRentalDeciderTest extends KernelTestCase
         $this->assertFalse($resultDecision);
     }
 
-    public function test_decides_for_not_premium_if_below_configured_threshold()
+    public function test_decides_for_not_premium_if_below_configured_threshold(): void
     {
         // Given
         $modelName = 'BestModel';
@@ -56,7 +56,7 @@ class PremiumRentalDeciderTest extends KernelTestCase
         $this->assertFalse($resultDecision);
     }
 
-    public function test_decides_for_premium_if_above_configured_threshold()
+    public function test_decides_for_premium_if_above_configured_threshold(): void
     {
         // Given
         $modelName = 'BestModel';

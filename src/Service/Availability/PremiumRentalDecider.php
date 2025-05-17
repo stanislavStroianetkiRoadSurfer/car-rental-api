@@ -17,13 +17,9 @@ class PremiumRentalDecider
     
     public function isPremiumOnly(Car $car, RentalPrice $rental): bool
     {
-        if (isset($this->modelThresholds[$car->getModel()]) && $rental->price > $this->modelThresholds[$car->getModel()]) {
-            return true;
-        }
         // with the idea of moving things into the db, the threshold could be retrieved like this instead
         // $car->getModel()->getPremiumThreshold()
         // having the need for multiple currencies, it'll get more complicated of course...
-
-        return false;
+        return isset($this->modelThresholds[$car->getModel()]) && $rental->price > $this->modelThresholds[$car->getModel()];
     }
 }
