@@ -9,6 +9,7 @@ use App\Service\Availability\AvailableCarsFetcher;
 use App\Service\Availability\PremiumRentalDecider;
 use App\Service\PricingApi\PricingClientInterface;
 use App\ViewModel\AvailabilityViewModel;
+use App\ViewModel\PriceViewModel;
 
 class AvailabilityService
 {
@@ -35,19 +36,21 @@ class AvailabilityService
             $request->getStationId(),
             array_keys($availableCars),
             $request->getStartDate(),
-            $request->getEndDate()
+            $request->getEndDate(),
+            'EUR'
         );
 
         $carsWithPricing = [];
         foreach ($rentalPrices as $rentalPrice) {
             $car = $availableCars[$rentalPrice->carId];
             $onlyForPremium = $this->premiumDecider->isPremiumOnly($car, $rentalPrice);
+            $price = new PriceViewModel($rentalPrice->price, $rentalPrice->currency);
 
             $carsWithPricing[] = new AvailabilityViewModel(
                 $car->getId(),
                 $car->getModel(),
                 $request->getStationId(),
-                $rentalPrice->price,
+                $price,
                 $onlyForPremium,
             );
         }

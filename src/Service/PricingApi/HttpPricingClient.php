@@ -32,8 +32,8 @@ class HttpPricingClient implements PricingClientInterface
                 [
                     'json' => [
                         'stationId' => $stationId,
-                        'carIds' => implode(',', $carIds),
-                        'startDate' => $startDate->format('Y-m-d'),
+                        'carIds' => $carIds,
+                        'startDate' => $startDate->format('Y-m-d'), // date only, ignoring time (H:i)
                         'endDate' => $endDate->format('Y-m-d'),
                         'currency' => $currency,
                     ],
