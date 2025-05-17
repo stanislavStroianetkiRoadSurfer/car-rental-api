@@ -37,9 +37,16 @@ class BookingFixtures extends Fixture implements DependentFixtureInterface
         ],
         [
             'car_ref' => 'car_muc_2',
-            'status' => BookingStatusConst::CANCELLED,
-            'startDate' => '2025-04-12 9:00',
+            'status' => BookingStatusConst::CONFIRMED,
+            'startDate' => '2025-06-12 9:00',
             'endDate' => '2025-06-20 10:00',
+            'customerEmail' => 'foo@roadsurfer.de',
+        ],
+        [
+            'car_ref' => 'car_muc_2',
+            'status' => BookingStatusConst::CANCELLED,
+            'startDate' => '2025-07-12 9:00',
+            'endDate' => '2025-07-20 10:00',
             'customerEmail' => 'foo@roadsurfer.de',
         ],
     ];

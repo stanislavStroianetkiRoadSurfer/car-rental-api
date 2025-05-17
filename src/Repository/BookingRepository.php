@@ -23,6 +23,8 @@ class BookingRepository extends ServiceEntityRepository implements BookingReposi
     {
         // Todo: logic copied over from example PR, needs to be tested thoroughly
         // sadly automated tests have an issue with loading booking fixtures...
+        // introduced the testing command instead that is being applied on the dev db, not test db
+        // testing of common use cases and some "edge cases" seem to confirm that the query logic works
         //
         // depending on the query to be used in the end, it should be considered to analyse the
         // query carefully using EXPLAIN and to create an index to improve the read performance
