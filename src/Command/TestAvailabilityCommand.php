@@ -110,6 +110,12 @@ class TestAvailabilityCommand extends Command
                 'endDate' => '2025-06-11 15:00',
                 'expectedNumOfAvailableCars' => 2,
             ],
+            [
+                'testCaseDescription' => 'timeframe to overlap with bookings for cars 1 *and* 2',
+                'startDate' => '2025-04-01 10:00',
+                'endDate' => '2025-06-21 15:00',
+                'expectedNumOfAvailableCars' => 1,
+            ],
         ];
     }
 
