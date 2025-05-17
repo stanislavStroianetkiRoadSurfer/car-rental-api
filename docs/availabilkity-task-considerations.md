@@ -70,7 +70,8 @@ The "availability calculation" is the core aspect of the solution and therefore 
 
 As mentioned above I will stick to most concepts established in the main branch, but might make slight adjustments. I will keep the adjustments focused on the task at hand, not aiming for full consistency accross the existing codebase. In a real life scenario I would suggest and discuss doing so before starting or when identifying a change need that feels sensible to apply and then apply it across the application to follow the boyscout rule.
 
-As mentioned at several places of this document, due to time constraints and unknowns of the business domain expectations, I decided to *not* implement all the suggested adjustments, but to introduce/sketch the "entry points" to expand them later on.
+Besides this document I added several inline comments. Most of them would not have been added if this would not be an assessment, explaining my thought process and decisions a bit deeper. Normally I might have chosen to add those to the PR instead.
+
 
 ## Obstacles during the implementation
 
