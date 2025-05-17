@@ -29,6 +29,7 @@ class AvailableCarsFetcher
      * plus additionally some more logic inside the php application.
      * 
      * As mentioned elsewhere, the read performance of both approaches can be improved by introducing appropriate indexes to the db.
+     * E.g. [station_id, active] for cars and [status, start_date, end_date] (or [start_date, end_date, status], to be found out) for bookings.
      * 
      * @return array|Car[] Array indexed by the car's id for easier retrieval. Improvement idea: a dedicated collection class
      */
@@ -37,9 +38,6 @@ class AvailableCarsFetcher
         \DateTimeInterface $startDate,
         \DateTimeInterface $endDate,
     ): array {
-        // 
-        
-        
         //return $this->simpleSolutionCloserToExampePR($stationId, $startDate, $endDate);
         
         return $this->rawSQLQueryMappedToEntitiesSolution($stationId, $startDate, $endDate);
