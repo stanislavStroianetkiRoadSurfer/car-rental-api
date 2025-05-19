@@ -92,3 +92,11 @@ Due to reaching my personal time limit to do all the implementation, I did not r
 Following that, I would probably have added (more) unit tests mainly for classes within the Service folder and integration tests for some central services, e.g. the AvailabilityService itself, to test it's wiring via Symfony's DIC (while needing to mock the pricing client).
 
 As a sidenode: at my previous company we used Behat or Codeception to do behavioral testing (BDD) on http level on several projects (not all), I did not see a clear benefit of suggesting or even implementing that, as not having a proper sparing on business behavior criteria anyways (which is the core goal of BDD to my understanding - not the http level tests).
+
+## Open tasks
+
+One thing that could have been added is a better validation of the start date/time and end date/time. E.g. not allowing pickups on Sundays, ensuring that start date is before end date, maybe also that the start time is in working hours, etc. An implementation option for that would be creating a custom validation constraint on the AvailabilityRequest *class* (over property, as we'd have dependencies in validation between properties) and a custom validator service, getting configuration details or e.g. the station repository injected to then do some validation.
+
+Some more automated tests. 
+
+Overall, I think my implementation and this should demonstrate my approach to maintainable software based on vague requirements and conventions.
