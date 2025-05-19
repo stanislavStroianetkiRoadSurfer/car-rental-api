@@ -64,7 +64,7 @@ I personally favour a bit more visible separation of layers, by folder structure
 
 ## Aimed approach
 
-The existing PR is implying a few details on the availability API endpoint structure (uri, using query parameters over route parameters, ...) which I will not touch but rather lean towards (while one could e.g. argue that /station/:station_id/availabilities might be a better API uri choice, etc.).
+The existing PR is implying a few details on the availability API endpoint structure (uri, using query parameters over route parameters, ...) which I will not touch but rather lean towards (while one could e.g. argue that /stations/:station_id/availabilities might be a better API uri choice, etc.).
 
 The "availability calculation" is the core aspect of the solution and therefore should be implemented robust and well tested.
 
