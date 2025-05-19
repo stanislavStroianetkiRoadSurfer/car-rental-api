@@ -97,6 +97,8 @@ As a sidenode: at my previous company we used Behat or Codeception to do behavio
 
 One thing that could have been added is a better validation of the start date/time and end date/time. E.g. not allowing pickups on Sundays, ensuring that start date is before end date, maybe also that the start time is in working hours, etc. An implementation option for that would be creating a custom validation constraint on the AvailabilityRequest *class* (over property, as we'd have dependencies in validation between properties) and a custom validator service, getting configuration details or e.g. the station repository injected to then do some validation.
 
-Some more automated tests. 
+Leaving the issue with the "broken" booking fixtures loading open and implementing a workaround via a custom cli command isn't ideal for sure, but was faster to achieve for this task by my judgement.
+
+Some more automated tests could be valuable, while I would say that most classes do not contain a too complex logic. Coverage could still be nice, particularly for those where refactorings or other adjustments might be expected.
 
 Overall, I think my implementation and this should demonstrate my approach to maintainable software based on vague requirements and conventions.
