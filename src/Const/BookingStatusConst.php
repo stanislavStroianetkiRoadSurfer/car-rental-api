@@ -12,4 +12,6 @@ class BookingStatusConst
     public const COMPLETED = 'completed';
     public const CANCELLED = 'cancelled';
     public const REJECTED = 'rejected';
+
+    public const UNBLOCKING_STATUSES = [self::CANCELLED, self::REJECTED]; 
 }
